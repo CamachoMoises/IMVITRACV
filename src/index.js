@@ -40,6 +40,8 @@ app.use(requestLogger);
 app.get('/test', handle);
 
 require('./route/user')(app);
+require('./route/worker')(app);
+require('./route/organization')(app);
 
 
 const unknownEndpoint = (request, response) => {
