@@ -4,9 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test": "test",
-    "start": "node index.js",
-    "dev": "nodemon src/index.js"
+    "test":"test",
+    "start":"node index.js",
+    "dev":"nodemon src/index.js"
   },
   "author": "MoisesInc",
   "license": "ISC",
