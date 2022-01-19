@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
-const sql = require('./database/database');
+const sql = require('./src/database/database');
 
 app.use(express.static('build'));
 app.use(express.json());
@@ -47,9 +47,9 @@ app.get('/', (req, res)=>{
 app.get('/test', handle);
 app.get('/testSQL', SQFunction);
 
-require('./route/user')(app);
-require('./route/worker')(app);
-require('./route/organization')(app);
+require('./src/route/user')(app);
+require('./src/route/worker')(app);
+require('./src/route/organization')(app);
 
 
 const unknownEndpoint = (request, response) => {
