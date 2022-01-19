@@ -14,8 +14,7 @@ let testSQL= async ()=>{
 	}
 }
 
-
-const handle = async (request, response)=>{
+const SQFunction = async (request, response)=>{
 	const testConnection = await testSQL();
 	if (testConnection.err) {
 		console.log('Error in the database', testConnection.err);
@@ -25,6 +24,11 @@ const handle = async (request, response)=>{
 
 	console.log('Body', testConnections);
 	response.send( testConnections);
+}
+const handle = (request, response)=>{
+	
+	console.log('Body');
+	response.send( 'Hola mundo');
 }
 
 console.log('Body', process.env.HOST);
@@ -38,6 +42,7 @@ const requestLogger = (request, response, next) => {
 
 app.use(requestLogger);
 app.get('/test', handle);
+app.get('/testSQL', SQFunction);
 
 require('./route/user')(app);
 require('./route/worker')(app);
