@@ -41,6 +41,9 @@ const requestLogger = (request, response, next) => {
 };
 
 app.use(requestLogger);
+app.get('/', (req, res)=>{
+	res.json('Hola')
+})
 app.get('/test', handle);
 app.get('/testSQL', SQFunction);
 
