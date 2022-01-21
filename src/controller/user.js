@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+var bcrypt = require('bcryptjs');
+
 const saltRounds = 10;
 const User = require('../database/user');
 
