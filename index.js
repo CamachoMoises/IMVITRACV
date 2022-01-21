@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const app = express();
 const sql = require('./src/database/database');
+const cloudinary = require('cloudinary');
 
 app.use(express.static('build'));
 app.use(express.json());
