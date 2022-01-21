@@ -4,6 +4,13 @@ const app = express();
 const sql = require('./src/database/database');
 const cloudinary = require('cloudinary');
 
+cloudinary.config({ 
+	cloud_name: 'moisesinc', 
+	api_key: '886546164878929', 
+	api_secret: 'sTFlN5y69sCC3kr97GTcyZiEWCA',
+	secure: true
+  });
+
 app.use(express.static('build'));
 app.use(express.json());
 
