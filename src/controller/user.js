@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-var bcrypt = require('bcryptjs');
-
+const bcrypt = require('bcryptjs');
+const path 			= require('path');
+const fs 			= require('fs');
 const saltRounds = 10;
 const User = require('../database/user');
 
