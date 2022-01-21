@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+const cloudinary = require('cloudinary');
+
 
 const bcrypt = require('bcryptjs');
 const path 			= require('path');
@@ -13,3 +15,25 @@ exports.List = async (req, res) => {
     console.log('List employees', US);
     res.json(US);
 } 
+
+
+exports.fileAdd = (req, res) => {
+    const files = req.files;
+	const obj = JSON.parse(JSON.stringify(files));
+
+    cloudinary.v2.uploader.upload(__basedir + '/resources/static/assets/uploads/' + obj.myFile[0].originalname,  { overwrite: true, },
+    function(error, result) {
+        
+        console.log('Ojoooo',result, error)
+        const response = {
+            result: JSON.stringify(result),
+            error: error
+        }
+        fs.unlink(path.join(__basedir + '/resources/static/assets/uploads/', obj.myFile[0].originalname), (err) => {
+			if (err) throw err;
+		});
+        return res.json(response);
+    });
+
+
+}

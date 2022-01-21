@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const sql = require('./src/database/database');
 const cloudinary = require('cloudinary');
+global.__basedir 	= __dirname;
 
 cloudinary.config({ 
 	cloud_name: 'moisesinc', 
