@@ -6,11 +6,13 @@
   "scripts": {
     "test": "test",
     "start": "node index.js",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "deploy": " git add . && git commit -m uibuild && git push heroku HEAD:master"
   },
   "author": "MoisesInc",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
     "cloudinary": "^1.28.1",
     "cors": "^2.8.5",
