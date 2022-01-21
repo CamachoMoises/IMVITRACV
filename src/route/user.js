@@ -1,6 +1,8 @@
 const expressJWT	= require('express-jwt');
 const User 			= require('../controller/user');
 const cors 			= require('cors');
+const multer 		= require('multer');
+
 
 module.exports = (app) => {
     app.use(cors());
