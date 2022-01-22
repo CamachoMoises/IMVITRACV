@@ -1,20 +1,15 @@
 const sql = require('./database');
 
-const Worker = function (worker) {
-	this.firstName = worker.firstName;
-	this.firstLastname = worker.firstLastname;
-	this.firstLastname = worker.firstLastname;
-	this.workerCode = worker.workerCode;
-	this.status = worker.status;
-};
-
-Worker.List = async ()=> {
+const Worker= function(worker){
+    this.firstName= worker.firstName;
+    this.firstLastname= worker.firstLastname;
+}
+Worker.List= async ()=> {
     try {
-		return await sql.query('call bgoescmoyuocwga4lecd.list_workers();');
+		return await sql.query('select * from bgoescmoyuocwga4lecd.workers');
 	} catch (err) {
 		return { err: err };
 	}
-};
+}
 
-
-module.exports = Worker;
+module.exports= Worker;
