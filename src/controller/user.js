@@ -15,25 +15,17 @@ exports.List = async (req, res) => {
     console.log('List employees', US);
     res.json(US);
 } 
-
-
-exports.fileAdd = (req, res) => {
-    const files = req.files;
-	const obj = JSON.parse(JSON.stringify(files));
-
-    cloudinary.v2.uploader.upload(__basedir + '/resources/static/assets/uploads/' + obj.myFile[0].originalname,  { overwrite: true, },
-    function(error, result) {
-        
-        console.log('Ojoooo',result, error)
-        const response = {
-            result: JSON.stringify(result),
-            error: error
-        }
-        fs.unlink(path.join(__basedir + '/resources/static/assets/uploads/', obj.myFile[0].originalname), (err) => {
-			if (err) throw err;
-		});
-        return res.json(response);
-    });
-
-
+exports.Authenticate = async (req, res, next) => {
+    const password = req.body.password;
+	let secret = 'some_secret';
+    const data = {
+		user1: req.body.username,
+		pwd1: req.body.password,
+	};
+    const userVerified = await User.findEmail(req.body.username);
+    if (userVerified.err) {
+		console.log('Error in the database', userVerified.err);
+		return res.status(400).json({ statusCode: 400, message: 'Error in the database' });
+	}
 }
+

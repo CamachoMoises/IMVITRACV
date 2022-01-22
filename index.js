@@ -1,65 +1,52 @@
 require('dotenv').config();
+const morgan = require('morgan');
 const express = require('express');
 const app = express();
 const sql = require('./src/database/database');
 const cloudinary = require('cloudinary');
-global.__basedir 	= __dirname;
 
-cloudinary.config({ 
-	cloud_name: 'moisesinc', 
-	api_key: '886546164878929', 
+global.__basedir = __dirname;
+
+cloudinary.config({
+	cloud_name: 'moisesinc',
+	api_key: '886546164878929',
 	api_secret: 'sTFlN5y69sCC3kr97GTcyZiEWCA',
-	secure: true
-  });
+	secure: true,
+});
 
-app.use(express.static('build'));
+morgan.token('body', (req, res) => {
+	if (req.body.username) {
+		return JSON.stringify(req.body);
+	}
+	return 'not body';
+});
+
+morgan.token('url', (req, res) => {
+	return req.url;
+});
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+
+
 app.use(express.json());
+app.use(express.raw());
+app.use(express.urlencoded({ extended: true }));
 
-let testSQL= async ()=>{
-	try {
-		return await sql.query('call bgoescmoyuocwga4lecd.log_test()');
-	} catch (err) {
-		return { err: err };
-	}
-}
+// const requestLogger = (request, response, next) => {
+// 	console.log('Method:', request.method);
+// 	console.log('Path:  ', request.path);
+// 	console.log('Body:  ', request.body);
+// 	console.log('---');
+// 	next();
+// };
 
-const SQFunction = async (request, response)=>{
-	const testConnection = await testSQL();
-	if (testConnection.err) {
-		console.log('Error in the database', testConnection.err);
-		return res.status(400).json({ statusCode: 400, message: 'Error in the database' });
-	}
-	let testConnections = testConnection[0][0];
-
-	console.log('Body', testConnections);
-	response.send( testConnections);
-}
-const handle = (request, response)=>{
-	
-	console.log('Body');
-	response.send( 'Hola mundo');
-}
-
-console.log('Body', process.env.HOST);
-const requestLogger = (request, response, next) => {
-	console.log('Method:', request.method);
-	console.log('Path:  ', request.path);
-	console.log('Body:  ', request.body);
-	console.log('---');
-	next();
-};
-
-app.use(requestLogger);
-app.get('/', (req, res)=>{
-	res.json('Hola')
-})
-app.get('/test', handle);
-app.get('/testSQL', SQFunction);
+//app.use(requestLogger);
+app.get('/', (req, res) => {
+	res.json('Hola');
+});
 
 require('./src/route/user')(app);
 require('./src/route/worker')(app);
 require('./src/route/organization')(app);
-
 
 const unknownEndpoint = (request, response) => {
 	response.status(404).send({ error: 'unknown endpoint' });

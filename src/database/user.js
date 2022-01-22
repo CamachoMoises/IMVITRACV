@@ -15,5 +15,13 @@ User.List = async () => {
 	}
 };
 
+User.findEmail = async (email) => {
+	try {
+		return await sql.query('SELECT userName, idUsers, status FROM bgoescmoyuocwga4lecd.users WHERE userName=?', [email]);
+	} catch (err) {
+		return { err: err };
+	}
+};
+
 
 module.exports = User;
