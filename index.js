@@ -31,8 +31,8 @@ User.encrypt();
 app.get('/', (req, res) => {
 	res.json('Hola');
 });
-require('./src/route/worker')(app);
 require('./src/route/user')(app);
+require('./src/route/worker')(app);
 
 const unknownEndpoint = (request, response) => {
 	response.status(404).send({ error: 'unknown endpoint' });
