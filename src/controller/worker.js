@@ -34,6 +34,17 @@ exports.Add = async (req, res) => {
         linkPhoto:req.body.linkPhoto,
         linkQR:req.body.linkQR,
     }
+    let workerType =  'COL' 
+    if (data.workerType=="2") {  
+        console.log('Chofer');
+        workerType= 'OPE'   
+    }
+    const code = await Worker.Last();
+   
+    const last = code[0][0].idWorker+1
+    const lastOrder= last.toLocaleString('en', {minimumIntegerDigits:4,useGrouping:false}) 
+    data.code= `${workerType}-${lastOrder}`
+    console.log('Data', data);
     const add= await Worker.Add(data);
     if (add.err) {
 		console.log('Error in the database', add.err);
