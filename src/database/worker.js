@@ -4,6 +4,13 @@ const Worker = function (worker) {
 	this.firstName = worker.firstName;
 	this.firstLastname = worker.firstLastname;
 };
+Worker.Profile = async (id)=> {
+	try {
+		return await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.workers WHERE (idWorker = ?)', [id]);
+	} catch (err) {
+		return { err: err };
+	}
+}
 Worker.List = async () => {
 	try {
 		return await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.workers');
@@ -135,5 +142,18 @@ Worker.Last = async (id) => {
 		return { err: err };
 	}
 };
+
+
+Worker.AddPhotoLink = async (data) => {
+	try {
+		return await sql.query('UPDATE bgoescmoyuocwga4lecd.workers SET linkPhoto = ? WHERE (idWorker =?);', [data.link ,data.id]);
+	} catch (err) {
+		return { err: err };
+	}
+
+}
+
+
+
 
 module.exports = Worker;

@@ -4,6 +4,8 @@ const express = require('express');
 const app = express();
 const cloudinary = require('cloudinary');
 const User 	= require('./src/controller/user');
+const WorkerDB = require('./src/database/worker');
+const cors = require('cors');
 global.__basedir = __dirname;
 
 cloudinary.config({
@@ -26,11 +28,26 @@ app.use(express.json());
 app.use(express.raw());
 app.use(express.urlencoded({ extended: true }));
 User.encrypt();
+app.use(cors());
 
 
 app.get('/', (req, res) => {
 	res.json('Hola');
 });
+
+app.get('/profile/:id', async (req, res)=> {
+	const id = req.params.id;
+	const profileNew = await WorkerDB.Profile(id)
+
+	if (profileNew.err) {
+		console.log('Error in the database', profileNew.err);
+		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: profileNew.err });
+	}
+	const worker= profileNew[0][0]
+
+	return res.json(worker)
+
+})
 require('./src/route/user')(app);
 require('./src/route/worker')(app);
 
