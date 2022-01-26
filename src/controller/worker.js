@@ -44,8 +44,6 @@ exports.Add = async (req, res) => {
     const lastOrder= last.toLocaleString('en', {minimumIntegerDigits:4,useGrouping:false}) 
     data.code= `${workerType}-${lastOrder}`
     const add= await Worker.Add(data);
-    console.log('Add!', add[0].insertId);
-
     if (add.err) {
 		console.log('Error in the database', add.err);
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
@@ -116,9 +114,6 @@ exports.fileAdd = (req, res) => {
         overwrite: true, 
     },
     async function(error, result) {
-        
-        console.log('Ojoooo',result, error)
-
         const data= {
             link: result.secure_url,
             id: id
@@ -127,7 +122,7 @@ exports.fileAdd = (req, res) => {
         const response = {
             result: result,
         }
-        if (updated.err){
+        if (updated.err || error){
             console.log('Error in the database addlink ' + updated.err);
             return res.status(400).json({ statusCode: 400, message: 'Error in the database addlink ' + updated.err });
         }
