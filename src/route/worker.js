@@ -20,7 +20,7 @@ module.exports = (app) => {
     app.get('/worker/list', Worker.List);
     app.post('/worker/newWorker', Worker.Add);
 	app.delete('/worker/delete/:id', Worker.Delete);
-	app.put('/worker/:id', Worker.Update);
+	app.put('/worker/Update/:id', Worker.Update);
 
 	app.put(
 		'/worker/photo/:id',

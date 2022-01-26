@@ -34,24 +34,23 @@ exports.Add = async (req, res) => {
         linkPhoto:req.body.linkPhoto,
         linkQR:req.body.linkQR,
     }
-    let workerType =  'COL' 
-    if (data.workerType=="2") {  
-        console.log('Chofer');
-        workerType= 'OPE'   
+    let workerType =  'OPE' 
+    if (data.workerType=="1") {  
+        workerType= 'COL'   
     }
     const code = await Worker.Last();
    
     const last = code[0][0].idWorker+1
     const lastOrder= last.toLocaleString('en', {minimumIntegerDigits:4,useGrouping:false}) 
     data.code= `${workerType}-${lastOrder}`
-    console.log('Data', data);
     const add= await Worker.Add(data);
+    console.log('Add!', add[0].insertId);
+
     if (add.err) {
 		console.log('Error in the database', add.err);
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
 	}
-
-    return res.status(200).json({ statusCode: 200, message: `data saved` });
+    return res.status(200).json({ statusCode: 200, message: `data saved` , id:add[0].insertId });
 
 }
 exports.Update = async (req, res) => {
@@ -76,18 +75,22 @@ exports.Update = async (req, res) => {
         status:req.body.status,
         absences:req.body.absences,
         observations:req.body.observations,
-        linkPhoto:req.body.linkPhoto,
         linkQR:req.body.linkQR,
     }
-    const update= await Worker.Update(data)
 
+    let workerType =  'OPE' 
+    if (data.workerType=="1") {  
+        data.type=null;
+        workerType= 'COL'   
+    }
+    const code= data.idWorker.toLocaleString('en', {minimumIntegerDigits:4,useGrouping:false}) 
+    data.code=`${workerType}-${code}`;
+    const update= await Worker.Update(data)
     if (update.err) {
 		console.log('Error in the database', update.err);
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: update.err });
 	}
-
     return res.status(200).json({ statusCode: 200, message: `data updated` });
-
 }
 
 exports.Delete = async (req, res) =>{
@@ -102,16 +105,31 @@ exports.Delete = async (req, res) =>{
 }
 
 exports.fileAdd = (req, res) => {
+    const id= req.params.id
     const files = req.files;
 	const obj = JSON.parse(JSON.stringify(files));
+    console.log('file');
 
-    cloudinary.v2.uploader.upload(__basedir + '/resources/static/assets/uploads/' + obj.myFile[0].originalname,  { overwrite: true, },
-    function(error, result) {
+    cloudinary.v2.uploader.upload(__basedir + '/resources/static/assets/uploads/' + obj.myFile[0].originalname,  { 
+        folder: "INVITRACV",
+        public_id: `file-worker-${id}`,
+        overwrite: true, 
+    },
+    async function(error, result) {
         
         console.log('Ojoooo',result, error)
+
+        const data= {
+            link: result.secure_url,
+            id: id
+        }
+        const updated= await Worker.AddPhotoLink(data) 
         const response = {
             result: result,
-            error: error
+        }
+        if (updated.err){
+            console.log('Error in the database addlink ' + updated.err);
+            return res.status(400).json({ statusCode: 400, message: 'Error in the database addlink ' + updated.err });
         }
         fs.unlink(path.join(__basedir + '/resources/static/assets/uploads/', obj.myFile[0].originalname), (err) => {
 			if (err) throw err;

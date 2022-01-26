@@ -89,7 +89,6 @@ Worker.Update = async(data) => {
 		status = ?, 
 		absences = ?, 
 		observations = ?, 
-		linkPhoto = ?, 
 		linkQR = ? 
 		WHERE (idWorker = ?);
 		`
@@ -113,7 +112,6 @@ Worker.Update = async(data) => {
 			data.status,
 			data.absences,
 			data.observations,
-			data.linkPhoto,
 			data.linkQR,
 			data.idWorker
 		]);
