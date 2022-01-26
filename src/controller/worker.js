@@ -49,7 +49,6 @@ exports.Add = async (req, res) => {
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
 	}
     return res.status(200).json({ statusCode: 200, message: `data saved` , id:add[0].insertId });
-
 }
 exports.Update = async (req, res) => {
     const data = {
