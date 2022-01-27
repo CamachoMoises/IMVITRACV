@@ -52,7 +52,7 @@ exports.Add = async (req, res) => {
 }
 exports.Update = async (req, res) => {
     const data = {
-        idWorker:req.params.id,
+        idWorker:+req.params.id,
         code:req.body.code,
         workerType:req.body.workerType,
         firstName:req.body.firstName,
