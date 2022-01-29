@@ -11,9 +11,9 @@ Worker.Profile = async (id)=> {
 		return { err: err };
 	}
 }
-Worker.List = async () => {
+Worker.List = async (data) => {
 	try {
-		return await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.workers');
+		return await sql.query('call bgoescmoyuocwga4lecd.list_workers(?, ?)',[data.init, data.size]);
 	} catch (err) {
 		return { err: err };
 	}
@@ -43,9 +43,11 @@ Worker.Add = async (data) => {
 			absences,
 			observations,
 			linkPhoto,
-			linkQR) 
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
-		`, [
+			linkQR,
+			dateInit,
+			dateEnd
+			) 
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
 			data.code,
 			data.workerType,
 			data.firstName,
@@ -66,7 +68,9 @@ Worker.Add = async (data) => {
 			data.absences,
 			data.observations,
 			data.linkPhoto,
-			data.linkQR
+			data.linkQR,
+			data.dateInit,
+			data.dateEnd,
 		]);
 	} catch (err) {
 		return { err: err };
@@ -96,7 +100,9 @@ Worker.Update = async(data) => {
 		status = ?, 
 		absences = ?, 
 		observations = ?, 
-		linkQR = ? 
+		linkQR = ?,
+		dateInit = ?, 
+		dateEnd= ?
 		WHERE (idWorker = ?);
 		`
 		,[
@@ -120,6 +126,8 @@ Worker.Update = async(data) => {
 			data.absences,
 			data.observations,
 			data.linkQR,
+			data.dateInit,
+			data.dateEnd,
 			data.idWorker
 		]);
 	} catch (err) {
