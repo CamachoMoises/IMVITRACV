@@ -121,7 +121,7 @@ exports.fileAdd = (req, res) => {
     const id= req.params.id
     const files = req.files;
 	const obj = JSON.parse(JSON.stringify(files));
-    console.log('file');
+  
 
     cloudinary.v2.uploader.upload(__basedir + '/resources/static/assets/uploads/' + obj.myFile[0].originalname,  { 
         folder: "INVITRACV",
