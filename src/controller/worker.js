@@ -104,7 +104,6 @@ exports.Update = async (req, res) => {
         data.type=null;
         workerType= 'COL'
     }
-    
     const code= data.idWorker.toLocaleString('en', {minimumIntegerDigits:4,useGrouping:false}) 
     data.code=`${workerType}-${code}`;
     const update= await Worker.Update(data)
