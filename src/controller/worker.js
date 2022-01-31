@@ -49,9 +49,14 @@ exports.Add = async (req, res) => {
         dateEnd:req.body.dateEnd,
     }
     let workerType =  'OPE' 
-    if (data.workerType=="1") {  
-        workerType= 'COL'   
+    if (data.workerType=="0") {  
+        workerType='TAX'
+        data.type=null;
+    }else if (data.workerType=="1"){ 
+        data.type=null;
+        workerType= 'COL'
     }
+
     const code = await Worker.Last();
    
     const last = code[0][0].idWorker+1
@@ -92,10 +97,14 @@ exports.Update = async (req, res) => {
     }
 
     let workerType =  'OPE' 
-    if (data.workerType=="1") {  
+    if (data.workerType=="0") {  
+        workerType='TAX'
         data.type=null;
-        workerType= 'COL'   
+    }else if (data.workerType=="1"){ 
+        data.type=null;
+        workerType= 'COL'
     }
+    
     const code= data.idWorker.toLocaleString('en', {minimumIntegerDigits:4,useGrouping:false}) 
     data.code=`${workerType}-${code}`;
     const update= await Worker.Update(data)
