@@ -165,10 +165,6 @@ Worker.AddPhotoLink = async (data) => {
 	} catch (err) {
 		return { err: err };
 	}
-
 }
-
-
-
 
 module.exports = Worker;
