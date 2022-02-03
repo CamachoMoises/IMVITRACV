@@ -151,6 +151,13 @@ Worker.Last = async (id) => {
 	}
 };
 
+Worker.Dashboard = async () => {
+	try {
+		return await sql.query('call bgoescmoyuocwga4lecd.dashboard_list();');
+	} catch (err) {
+		return { err: err };
+	}
+}
 
 Worker.AddPhotoLink = async (data) => {
 	try {

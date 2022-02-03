@@ -21,7 +21,7 @@ module.exports = (app) => {
     app.post('/worker/newWorker', Worker.Add);
 	app.delete('/worker/delete/:id', Worker.Delete);
 	app.put('/worker/Update/:id', Worker.Update);
-
+	app.get('/worker/dashboard', Worker.Dashboard)
 	app.put(
 		'/worker/photo/:id',
 		upload.fields([{ name: 'myFile', maxCount: 1 }]),
