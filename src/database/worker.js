@@ -43,11 +43,10 @@ Worker.Add = async (data) => {
 			absences,
 			observations,
 			linkPhoto,
-			linkQR,
 			dateInit,
 			dateEnd
 			) 
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`, [
 			data.code,
 			data.workerType,
 			data.firstName,
@@ -68,7 +67,6 @@ Worker.Add = async (data) => {
 			data.absences,
 			data.observations,
 			data.linkPhoto,
-			data.linkQR,
 			data.dateInit,
 			data.dateEnd,
 		]);
@@ -100,7 +98,6 @@ Worker.Update = async(data) => {
 		status = ?, 
 		absences = ?, 
 		observations = ?, 
-		linkQR = ?,
 		dateInit = ?, 
 		dateEnd= ?
 		WHERE (idWorker = ?);
@@ -125,7 +122,6 @@ Worker.Update = async(data) => {
 			data.status,
 			data.absences,
 			data.observations,
-			data.linkQR,
 			data.dateInit,
 			data.dateEnd,
 			data.idWorker

@@ -13,15 +13,13 @@ let storage = multer.diskStorage({
 
 let upload = multer({ storage: storage });
 
-
-
 module.exports = (app) => {
     app.use(cors());
     app.get('/worker/list/:page/:size', Worker.List);
     app.post('/worker/newWorker', Worker.Add);
 	app.delete('/worker/delete/:id', Worker.Delete);
 	app.put('/worker/Update/:id', Worker.Update);
-	app.get('/worker/dashboard', Worker.Dashboard)
+	app.get('/worker/dashboard', Worker.Dashboard);
 	app.put(
 		'/worker/photo/:id',
 		upload.fields([{ name: 'myFile', maxCount: 1 }]),

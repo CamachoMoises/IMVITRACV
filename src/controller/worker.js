@@ -3,6 +3,7 @@ const cloudinary = require('cloudinary');
 const fs = require('fs');
 const path = require('path');
 
+
 exports.List = async (req, res) => {
 	const page = +req.params.page;
 	const size = +req.params.size;
@@ -43,7 +44,6 @@ exports.Add = async (req, res) => {
 		absences: req.body.absences,
 		observations: req.body.observations,
 		linkPhoto: req.body.linkPhoto,
-		linkQR: req.body.linkQR,
 		dateInit: req.body.dateInit,
 		dateEnd: req.body.dateEnd,
 	};
@@ -54,6 +54,9 @@ exports.Add = async (req, res) => {
 	} else if (data.workerType == '1') {
 		data.type = null;
 		workerType = 'COL';
+	}else if (data.workerType == '3') {
+		data.type = null;
+		workerType = 'MOT';
 	}
 
 	const code = await Worker.Last();
@@ -102,7 +105,11 @@ exports.Update = async (req, res) => {
 	} else if (data.workerType == '1') {
 		data.type = null;
 		workerType = 'COL';
+	}else if (data.workerType == '3') {
+		data.type = null;
+		workerType = 'MOT';
 	}
+
 	const code = data.idWorker.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
 	data.code = `${workerType}-${code}`;
 	const update = await Worker.Update(data);
@@ -163,13 +170,31 @@ exports.Dashboard = async (req, res) => {
 		console.log('Error in the database Dashboard ' + data.err);
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database Dashboard ' + data.err });
 	}
-    const response ={   
-        allMembers: data[0][0][0].allMembers,
-        cabbie: data[0][1][0].cabbie,
-        collector:  data[0][2][0].collector,
-        driver: data[0][3][0].driver
-    }
+	const response = {
+		allMembers: data[0][0][0].allMembers,
+		cabbie: data[0][1][0].cabbie,
+		collector: data[0][2][0].collector,
+		driver: data[0][3][0].driver,
+		moto: data[0][4][0].moto
+	};
 
-    return res.json(response);
+	return res.json(response);
+};
 
+exports.QrLoad = async (req, res) => {
+	const data = req.body.url;
+	const data2= 'https://res.cloudinary.com/moisesinc/image/upload/v1643142544/y6brji5cl3xi5qv3pkbg.jpg';
+	console.log('url qr', data);
+	// https.request(data, (res) => {
+	// 	let steam = new Stream();
+	// 	res.on('data', (chunk) => {
+	// 		console.log('chunk', chunk);
+	// 		steam.push(chunk);
+	// 	});
+	// 	res.on('end', () => {
+	// 		fs.writeFileSync(__basedir+ '/resources/static/assets/temp//d1.jpg', steam.read() )
+	// 	})
+	// }).end();
+
+	return res.json('Hola');
 };
