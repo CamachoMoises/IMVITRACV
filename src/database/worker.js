@@ -11,6 +11,7 @@ Worker.Profile = async (id)=> {
 		return { err: err };
 	}
 }
+
 Worker.List = async (data) => {
 	try {
 		return await sql.query('call bgoescmoyuocwga4lecd.list_workers(?, ?)',[data.init, data.size]);
