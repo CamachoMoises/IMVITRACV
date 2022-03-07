@@ -7,19 +7,31 @@ const path = require('path');
 exports.List = async (req, res) => {
 	const page = +req.params.page;
 	const size = +req.params.size;
+	const filter = req.params.filter;
 	const init = (page + 1) * size - size;
 	const data = {
 		init: init,
 		size: size,
+		filter:filter
 	};
-	const worker = await Worker.List(data);
-	const WK = worker[0][0];
-	const dataLength = worker[0][1][0];
-	const dataResponse = {
-		workers: WK,
-		dataLength: dataLength,
-	};
-	return res.json(dataResponse);
+	if(filter=='Unfiltered'){
+		const worker = await Worker.List(data);
+		const WK = worker[0][0];
+		const dataLength = worker[0][1][0];
+		const dataResponse = {
+			workers: WK,
+			dataLength: dataLength,
+		};
+		return res.json(dataResponse);
+	}else{
+		const worker= await Worker.ListFiltered(data);
+		const lengthResult = await Worker.countFiltered(data);
+		const dataResponse={
+			workers:worker[0],
+			dataLength: lengthResult[0][0]
+		}
+		return res.json(dataResponse);
+	}
 };
 
 exports.Add = async (req, res) => {

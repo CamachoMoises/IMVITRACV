@@ -15,7 +15,7 @@ let upload = multer({ storage: storage });
 
 module.exports = (app) => {
     app.use(cors());
-    app.get('/worker/list/:page/:size', Worker.List);
+    app.get('/worker/list/:page/:size/:filter', Worker.List);
     app.post('/worker/newWorker', Worker.Add);
 	app.delete('/worker/delete/:id', Worker.Delete);
 	app.put('/worker/Update/:id', Worker.Update);

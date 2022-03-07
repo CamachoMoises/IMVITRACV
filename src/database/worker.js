@@ -4,6 +4,7 @@ const Worker = function (worker) {
 	this.firstName = worker.firstName;
 	this.firstLastname = worker.firstLastname;
 };
+
 Worker.Profile = async (id)=> {
 	try {
 		return await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.workers WHERE (idWorker = ?)', [id]);
@@ -19,6 +20,40 @@ Worker.List = async (data) => {
 		return { err: err };
 	}
 };
+
+Worker.ListFiltered = async (data) => {
+	try {
+		return await sql.query(`SELECT * FROM bgoescmoyuocwga4lecd.workers  
+		Where 
+		firstName Like '%${data.filter}%' Or 
+		secondName Like '%${data.filter}%' Or 
+		firstLastname Like '%${data.filter}%' Or
+		secondLastname Like '%${data.filter}%' Or
+		DNI Like '%${data.filter}%' Or
+		email Like '%${data.filter}%' Or
+		phone Like '%${data.filter}%' 
+		limit ${data.init}, ${data.size};`)
+	}catch(err) {
+		return { err: err };
+	}
+}
+
+Worker.countFiltered = async (data) => {
+	try{
+		return await sql.query(`SELECT count(*)  as dataLength from bgoescmoyuocwga4lecd.workers 
+		Where 
+		firstName Like '%${data.filter}%' Or 
+		secondName Like '%${data.filter}%' Or 
+		firstLastname Like '%${data.filter}%' Or
+		secondLastname Like '%${data.filter}%' Or
+		DNI Like '%${data.filter}%' Or
+		email Like '%${data.filter}%' Or
+		phone Like '%${data.filter}%' 
+		;`)
+	}catch (err) {
+		return { err: err };
+	}
+}
 
 Worker.Add = async (data) => {
 	try {
