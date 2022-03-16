@@ -17,7 +17,7 @@ module.exports = (app) => {
     app.use(cors());
     app.get('/worker/list/:page/:size/:filter', Worker.List);
     app.post('/worker/newWorker', Worker.Add);
-	app.delete('/worker/delete/:id', Worker.Delete);
+	app.delete('/worker/delete/:id/:workerType', Worker.Delete);
 	app.put('/worker/Update/:id', Worker.Update);
 	app.get('/worker/dashboard', Worker.Dashboard);
 	app.put(

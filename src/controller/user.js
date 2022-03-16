@@ -9,6 +9,7 @@ exports.List = async (req, res) => {
 	res.json(US);
 };
 exports.Authenticate = async (req, res, next) => {
+	console.log('Login');
 	const password = req.body.password;
 	let secret = 'some_secret';
 	const data = {

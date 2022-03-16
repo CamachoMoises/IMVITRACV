@@ -1,4 +1,5 @@
 const Worker = require('../database/worker');
+const WorkerFire = require('../database/firebase/worker');
 const cloudinary = require('cloudinary');
 const fs = require('fs');
 const path = require('path');
@@ -8,27 +9,43 @@ exports.List = async (req, res) => {
 	const size = +req.params.size;
 	const filter = req.params.filter;
 	const init = (page + 1) * size - size;
-	const data = {
+	const properties = {
 		init: init,
 		size: size,
-		filter:filter
+		filter: filter,
+		page: page,
 	};
-	if(filter=='Unfiltered'){
-		const worker = await Worker.List(data);
-		const WK = worker[0][0];
-		const dataLength = worker[0][1][0];
-		const dataResponse = {
-			workers: WK,
-			dataLength: dataLength,
+	if (filter == 'Unfiltered') {
+		let dataResponse = {};
+		//const worker = await Worker.List(properties);
+		//const WK = worker[0][0];
+		//const dataLength = worker[0][1][0];
+		const count = WorkerFire.count;
+		count.on('value', (snap) => {
+			snap.forEach((countWorker) => {
+				dataResponse.dataLength = { dataLength: countWorker.val().value };
+			});
+		});
+		const WorkerOnFireStore = await WorkerFire.List(properties);
+		dataResponse = {
+			...{
+				//workersSQL: WK,
+				workers: WorkerOnFireStore,
+				//dataLengthSQL: dataLength,
+			},
+			...dataResponse,
 		};
 		return res.json(dataResponse);
-	}else{
-		const worker= await Worker.ListFiltered(data);
-		const lengthResult = await Worker.countFiltered(data);
-		const dataResponse={
-			workers:worker[0],
-			dataLength: lengthResult[0][0]
-		}
+	} else {
+		const workerFire = await WorkerFire.FilteredList(properties);
+
+		// const worker = await Worker.ListFiltered(properties);
+		//const lengthResult = await Worker.countFiltered(properties);
+		const dataResponse = {
+			//workers: worker[0],
+			workerFire: workerFire,
+			//dataLength: lengthResult[0][0],
+		};
 		return res.json(dataResponse);
 	}
 };
@@ -36,7 +53,7 @@ exports.List = async (req, res) => {
 exports.Add = async (req, res) => {
 	const data = {
 		code: req.body.code,
-		workerType: req.body.workerType,
+		workerType: +req.body.workerType,
 		firstName: req.body.firstName,
 		secondName: req.body.secondName,
 		firstLastname: req.body.firstLastname,
@@ -58,35 +75,61 @@ exports.Add = async (req, res) => {
 		dateInit: req.body.dateInit,
 		dateEnd: req.body.dateEnd,
 	};
+	const count = WorkerFire.count;
+	let dataKey;
+	let codes = 0;
+	let value = 0;
+	const optionW = ['cabbie', 'collector', 'driver', 'cabbie_biker'];
+	let type = [0, 0, 0, 0];
+	count.on('value', (snap) => {
+		snap.forEach((countWorker) => {
+			dataKey = countWorker.key;
+			codes = +countWorker.val().code;
+			value = +countWorker.val().value;
+			type[0] = +countWorker.val().cabbie;
+			type[1] = +countWorker.val().collector;
+			type[2] = +countWorker.val().driver;
+			type[3] = +countWorker.val().cabbie_biker;
+		});
+	});
 	let workerType = 'OPE';
-	if (data.workerType == '0') {
+	if (data.workerType === 0) {
 		workerType = 'TAX';
 		data.type = null;
-	} else if (data.workerType == '1') {
+	} else if (data.workerType === 1) {
 		data.type = null;
 		workerType = 'COL';
-	}else if (data.workerType == '3') {
+	} else if (data.workerType === 3) {
 		data.type = null;
 		workerType = 'MOT';
 	}
-
-	const code = await Worker.Last();
-
-	const last = code[0][0].idWorker + 1;
-	const lastOrder = last.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
-	data.code = `${workerType}-${lastOrder}`;
-	const add = await Worker.Add(data);
-	if (add.err) {
-		console.log('Error in the database', add.err);
-		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
-	}
-	return res.status(200).json({ statusCode: 200, message: `data saved`, id: add[0].insertId });
+	setTimeout(async () => {
+		console.log('dataKey', dataKey, code, value);
+		const last = codes + 1;
+		const lastOrder = last.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
+		data.code = `${workerType}-${lastOrder}`;
+		const add = await WorkerFire.Add(data);
+		if (add.err) {
+			console.log('Error in the database', add.err);
+			return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
+		} else {
+			let dataCount = {
+				code: codes + 1,
+				value: value + 1,
+			};
+			dataCount[optionW[data.workerType]] = type[data.workerType] + 1;
+			count.child(dataKey).update(dataCount);
+			return res.status(200).json({ statusCode: 200, message: `data saved`, id: add });
+		}
+	}, 1000);
+	// const code = await Worker.Last();
 };
 exports.Update = async (req, res) => {
+	const idWorker = req.params.id;
+	const oldType = +req.body.oldType;
 	const data = {
-		idWorker: +req.params.id,
 		code: req.body.code,
-		workerType: req.body.workerType,
+		workerType: +req.body.workerType,
 		firstName: req.body.firstName,
 		secondName: req.body.secondName,
 		firstLastname: req.body.firstLastname,
@@ -104,42 +147,86 @@ exports.Update = async (req, res) => {
 		status: req.body.status,
 		absences: req.body.absences,
 		observations: req.body.observations,
-		linkQR: req.body.linkQR,
+		linkPhoto: req.body.linkPhoto,
 		dateInit: req.body.dateInit,
 		dateEnd: req.body.dateEnd,
 	};
-
+	const count = WorkerFire.count;
+	let dataKey;
+	const optionW = ['cabbie', 'collector', 'driver', 'cabbie_biker'];
+	let type = [0, 0, 0, 0];
+	count.on('value', (snap) => {
+		snap.forEach((countWorker) => {
+			dataKey = countWorker.key;
+			type[0] = +countWorker.val().cabbie;
+			type[1] = +countWorker.val().collector;
+			type[2] = +countWorker.val().driver;
+			type[3] = +countWorker.val().cabbie_biker;
+		});
+	});
 	let workerType = 'OPE';
-	if (data.workerType == '0') {
+	if (data.workerType == 0) {
 		workerType = 'TAX';
 		data.type = null;
-	} else if (data.workerType == '1') {
+	} else if (data.workerType == 1) {
 		data.type = null;
 		workerType = 'COL';
-	}else if (data.workerType == '3') {
+	} else if (data.workerType == 3) {
 		data.type = null;
 		workerType = 'MOT';
 	}
-
-	const code = data.idWorker.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
+	const lastLetter = +data.code.toString().slice(data.code.length - 4);
+	console.log('lastLetter', lastLetter);
+	const code = lastLetter.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
 	data.code = `${workerType}-${code}`;
-	const update = await Worker.Update(data);
-	if (update.err) {
-		console.log('Error in the database', update.err);
-		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: update.err });
-	}
-	return res.status(200).json({ statusCode: 200, message: `data updated` });
+	setTimeout(async () => {
+		const update = await WorkerFire.Update(data, idWorker);
+		if (update.err) {
+			console.log('Error in the database', update.err);
+			return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: update.err });
+		}
+		if(oldType !==  data.workerType){
+			let dataCount = {}
+			dataCount[optionW[data.workerType]] = type[data.workerType]+1
+			dataCount[optionW[oldType]] = type[oldType]-1
+			count.child(dataKey).update(dataCount);
+		}
+		return res.status(200).json({ statusCode: 200, message: `data updated` });
+	}, 1000);
+	// console.log('data', data);
+	//const update = await Worker.Update(data);
 };
 
 exports.Delete = async (req, res) => {
 	const id = req.params.id;
-	console.log('id:', id);
-	const deleted = await Worker.Delete(id);
-	if (deleted.err) {
-		console.log('Error in the database delete deleted ' + deleted.err);
-		return res.status(400).json({ statusCode: 400, message: 'Error in the database delete ' + deleted.err });
-	}
-	res.json('successful');
+	const workerType= +req.params.workerType;
+	const count = WorkerFire.count;
+	const optionW = ['cabbie', 'collector', 'driver', 'cabbie_biker'];
+	let dataKey;
+	let value = 0;
+	let countType= 0
+	count.on('value', (snap) => {
+		snap.forEach((countWorker) => {
+			dataKey = countWorker.key;
+			value = +countWorker.val().value;
+			countType = +countWorker.val()[optionW[workerType]];
+			console.log(`id to delete: ${id} , type: ${optionW[workerType]}, count:${countType} `);
+		});
+	});
+	setTimeout(async () => {
+		const deleted = await WorkerFire.Delete(id);
+		if (deleted.err) {
+			console.log('Error in the database delete deleted ' + deleted.err);
+			return res.status(400).json({ statusCode: 400, message: 'Error in the database delete ' + deleted.err });
+		}else{
+			let dataCount = {}
+			dataCount[optionW[workerType]] = countType-1;
+			dataCount.value=value-1;
+			count.child(dataKey).update(dataCount);
+			res.json('successful');
+		}
+	}, 1000)
+
 };
 
 exports.fileAdd = (req, res) => {
@@ -159,7 +246,7 @@ exports.fileAdd = (req, res) => {
 				link: result.secure_url,
 				id: id,
 			};
-			const updated = await Worker.AddPhotoLink(data);
+			const updated = await WorkerFire.AddPhotoLink(data);
 			const response = {
 				result: result,
 			};
@@ -186,7 +273,7 @@ exports.Dashboard = async (req, res) => {
 		cabbie: data[0][1][0].cabbie,
 		collector: data[0][2][0].collector,
 		driver: data[0][3][0].driver,
-		moto: data[0][4][0].moto
+		moto: data[0][4][0].moto,
 	};
 
 	return res.json(response);
@@ -194,7 +281,7 @@ exports.Dashboard = async (req, res) => {
 
 exports.QrLoad = async (req, res) => {
 	const data = req.body.url;
-	const data2= 'https://res.cloudinary.com/moisesinc/image/upload/v1643142544/y6brji5cl3xi5qv3pkbg.jpg';
+	const data2 = 'https://res.cloudinary.com/moisesinc/image/upload/v1643142544/y6brji5cl3xi5qv3pkbg.jpg';
 	console.log('url qr', data);
 	// https.request(data, (res) => {
 	// 	let steam = new Stream();
