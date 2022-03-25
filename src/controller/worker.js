@@ -58,29 +58,33 @@ exports.Add = async (req, res) => {
 		dateInit: req.body.dateInit,
 		dateEnd: req.body.dateEnd,
 	};
-	let workerType = 'OPE';
-	if (data.workerType == '0') {
-		workerType = 'TAX';
-		data.type = null;
-	} else if (data.workerType == '1') {
-		data.type = null;
-		workerType = 'COL';
-	}else if (data.workerType == '3') {
-		data.type = null;
-		workerType = 'MOT';
-	}
+	console.log(data);
+	// let workerType = 'OPE';
+	// if (data.workerType == '0') {
+	// 	workerType = 'TAX';
+	// 	data.type = null;
+	// } else if (data.workerType == '1') {
+	// 	data.type = null;
+	// 	workerType = 'COL';
+	// }else if (data.workerType == '3') {
+	// 	data.type = null;
+	// 	workerType = 'MOT';
+	// }
 
-	const code = await Worker.Last();
+	// const code = await Worker.Last();
 
-	const last = code[0][0].idWorker + 1;
-	const lastOrder = last.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
-	data.code = `${workerType}-${lastOrder}`;
+	// const last = code[0][0].idWorker + 1;
+	// const lastOrder = last.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
+	// data.code = `${workerType}-${lastOrder}`;
+	
+	
+	
 	const add = await Worker.Add(data);
 	if (add.err) {
 		console.log('Error in the database', add.err);
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
 	}
-	return res.status(200).json({ statusCode: 200, message: `data saved`, id: add[0].insertId });
+	return res.status(200).json({ statusCode: 200, message: `data saved`, id: null });
 };
 exports.Update = async (req, res) => {
 	const data = {
@@ -109,20 +113,20 @@ exports.Update = async (req, res) => {
 		dateEnd: req.body.dateEnd,
 	};
 
-	let workerType = 'OPE';
-	if (data.workerType == '0') {
-		workerType = 'TAX';
-		data.type = null;
-	} else if (data.workerType == '1') {
-		data.type = null;
-		workerType = 'COL';
-	}else if (data.workerType == '3') {
-		data.type = null;
-		workerType = 'MOT';
-	}
+	// let workerType = 'OPE';
+	// if (data.workerType == '0') {
+	// 	workerType = 'TAX';
+	// 	data.type = null;
+	// } else if (data.workerType == '1') {
+	// 	data.type = null;
+	// 	workerType = 'COL';
+	// }else if (data.workerType == '3') {
+	// 	data.type = null;
+	// 	workerType = 'MOT';
+	// }
 
-	const code = data.idWorker.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
-	data.code = `${workerType}-${code}`;
+	// const code = data.idWorker.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
+	// data.code = `${workerType}-${code}`;
 	const update = await Worker.Update(data);
 	if (update.err) {
 		console.log('Error in the database', update.err);
@@ -186,7 +190,8 @@ exports.Dashboard = async (req, res) => {
 		cabbie: data[0][1][0].cabbie,
 		collector: data[0][2][0].collector,
 		driver: data[0][3][0].driver,
-		moto: data[0][4][0].moto
+		moto: data[0][4][0].moto,
+		admn: data[0][5][0].admn
 	};
 
 	return res.json(response);
