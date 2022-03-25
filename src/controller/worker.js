@@ -76,9 +76,6 @@ exports.Add = async (req, res) => {
 	// const last = code[0][0].idWorker + 1;
 	// const lastOrder = last.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
 	// data.code = `${workerType}-${lastOrder}`;
-	
-	
-	
 	const add = await Worker.Add(data);
 	if (add.err) {
 		console.log('Error in the database', add.err);
