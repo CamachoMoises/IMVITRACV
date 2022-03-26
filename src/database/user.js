@@ -7,6 +7,7 @@ const User = function (user) {
 	this.status = user.status;
 };
 
+
 User.List = async () => {
 	try {
 		return await sql.query('call bgoescmoyuocwga4lecd.list_users()');
