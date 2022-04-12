@@ -7,7 +7,7 @@ const Worker = function (worker) {
 
 Worker.Profile = async (id)=> {
 	try {
-		return await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.workers WHERE (idWorker = ?)', [id]);
+		return await sql.query('SELECT * FROM workers WHERE (idWorker = ?)', [id]);
 	} catch (err) {
 		return { err: err };
 	}
@@ -15,7 +15,9 @@ Worker.Profile = async (id)=> {
 
 Worker.List = async (data) => {
 	try {
-		return await sql.query('call bgoescmoyuocwga4lecd.list_workers(?, ?)',[data.init, data.size]);
+		const workers = await sql.query(`SELECT * FROM workers  limit ${data.init}, ${data.size};`);
+		const count = await sql.query(`SELECT count(*)  as dataLength from workers;`);
+		return [workers[0], count[0][0]] 
 	} catch (err) {
 		return { err: err };
 	}
@@ -23,7 +25,7 @@ Worker.List = async (data) => {
 
 Worker.ListFiltered = async (data) => {
 	try {
-		return await sql.query(`SELECT * FROM bgoescmoyuocwga4lecd.workers  
+		return await sql.query(`SELECT * FROM workers  
 		Where 
 		firstName Like '%${data.filter}%' Or 
 		secondName Like '%${data.filter}%' Or 
@@ -40,7 +42,7 @@ Worker.ListFiltered = async (data) => {
 
 Worker.countFiltered = async (data) => {
 	try{
-		return await sql.query(`SELECT count(*)  as dataLength from bgoescmoyuocwga4lecd.workers 
+		return await sql.query(`SELECT count(*)  as dataLength from workers 
 		Where 
 		firstName Like '%${data.filter}%' Or 
 		secondName Like '%${data.filter}%' Or 
@@ -58,7 +60,7 @@ Worker.countFiltered = async (data) => {
 Worker.Add = async (data) => {
 	try {
 		return await sql.query(`
-		INSERT INTO bgoescmoyuocwga4lecd.workers (
+		INSERT INTO workers (
 			code,
 			workerType,
 			firstName,
@@ -114,7 +116,7 @@ Worker.Add = async (data) => {
 Worker.Update = async(data) => {
 	try {
 		return await sql.query(`
-		UPDATE bgoescmoyuocwga4lecd.workers SET 
+		UPDATE workers SET 
 		code = ?, 
 		workerType = ?, 
 		firstName = ?, 
@@ -169,7 +171,7 @@ Worker.Update = async(data) => {
 
 Worker.Delete = async (id) => {
 	try {
-		return await sql.query('DELETE FROM bgoescmoyuocwga4lecd.workers WHERE (idWorker = ?)', [id]);
+		return await sql.query('DELETE FROM workers WHERE (idWorker = ?)', [id]);
 	} catch (err) {
 		return { err: err };
 	}
@@ -177,7 +179,7 @@ Worker.Delete = async (id) => {
 
 Worker.Last = async (id) => {
 	try {
-		return await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.workers ORDER BY idWorker DESC LIMIT 1', [id]);
+		return await sql.query('SELECT * FROM workers ORDER BY idWorker DESC LIMIT 1', [id]);
 	} catch (err) {
 		return { err: err };
 	}
@@ -185,7 +187,13 @@ Worker.Last = async (id) => {
 
 Worker.Dashboard = async () => {
 	try {
-		return await sql.query('call bgoescmoyuocwga4lecd.dashboard_list();');
+		const allMembers= await sql.query('SELECT count(*)  as allMembers from workers;');
+		const cabbie= await sql.query('SELECT count(*)  as cabbie from workers where workerType=0;');
+		const collector= await sql.query('SELECT count(*)  as collector from workers where workerType=1;');
+		const driver= await sql.query('SELECT count(*)  as driver from workers where workerType=2;');
+		const moto= await sql.query('SELECT count(*)  as moto from workers where workerType=3;');
+		const admn= await sql.query('SELECT count(*)  as admn from workers where workerType=4;');
+		return [allMembers[0][0], cabbie[0][0], collector[0][0], driver[0][0], moto[0][0], admn[0][0]]; 
 	} catch (err) {
 		return { err: err };
 	}
@@ -193,7 +201,7 @@ Worker.Dashboard = async () => {
 
 Worker.AddPhotoLink = async (data) => {
 	try {
-		return await sql.query('UPDATE bgoescmoyuocwga4lecd.workers SET linkPhoto = ? WHERE (idWorker =?);', [data.link ,data.id]);
+		return await sql.query('UPDATE workers SET linkPhoto = ? WHERE (idWorker =?);', [data.link ,data.id]);
 	} catch (err) {
 		return { err: err };
 	}

@@ -28,6 +28,7 @@ app.use(express.json());
 app.use(express.raw());
 app.use(express.urlencoded({ extended: true }));
 User.encrypt();
+//User.addNewData();
 app.use(cors());
 
 

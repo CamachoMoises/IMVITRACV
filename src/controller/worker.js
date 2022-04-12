@@ -15,11 +15,10 @@ exports.List = async (req, res) => {
 	};
 	if(filter=='Unfiltered'){
 		const worker = await Worker.List(data);
-		const WK = worker[0][0];
-		const dataLength = worker[0][1][0];
+
 		const dataResponse = {
-			workers: WK,
-			dataLength: dataLength,
+			workers: worker[0],
+			dataLength: worker[1] ,
 		};
 		return res.json(dataResponse);
 	}else{
@@ -183,14 +182,13 @@ exports.Dashboard = async (req, res) => {
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database Dashboard ' + data.err });
 	}
 	const response = {
-		allMembers: data[0][0][0].allMembers,
-		cabbie: data[0][1][0].cabbie,
-		collector: data[0][2][0].collector,
-		driver: data[0][3][0].driver,
-		moto: data[0][4][0].moto,
-		admn: data[0][5][0].admn
+		allMembers: data[0].allMembers,
+		cabbie: data[1].cabbie,
+		collector: data[2].collector,
+		driver: data[3].driver,
+		moto: data[4].moto,
+		admn: data[5].admn
 	};
-
 	return res.json(response);
 };
 
