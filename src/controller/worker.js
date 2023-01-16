@@ -2,6 +2,7 @@ const Worker = require('../database/worker');
 const cloudinary = require('cloudinary');
 const fs = require('fs');
 const path = require('path');
+const QrCode =require('qrcode');
 
 exports.List = async (req, res) => {
 	const page = +req.params.page;
