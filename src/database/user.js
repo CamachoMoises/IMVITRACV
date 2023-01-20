@@ -10,7 +10,7 @@ const User = function (user) {
 
 User.List = async () => {
 	try {
-		return await sql.query('call bgoescmoyuocwga4lecd.list_users()');
+		return await sql.query('call list_users()');
 	} catch (err) {
 		return { err: err };
 	}
@@ -18,7 +18,7 @@ User.List = async () => {
 
 User.findEmail = async (email) => {
 	try {
-		return await sql.query('SELECT status FROM bgoescmoyuocwga4lecd.users WHERE userName=?', [email]);
+		return await sql.query('SELECT status FROM users WHERE userName=?', [email]);
 	} catch (err) {
 		return { err: err };
 	}
@@ -26,7 +26,7 @@ User.findEmail = async (email) => {
 
 User.Authenticate = async (data) => {
 	try {
-		return await sql.query('SELECT userName, password, idUser, status FROM bgoescmoyuocwga4lecd.users WHERE userName=?', [data.user]);
+		return await sql.query('SELECT userName, password, idUser, status FROM users WHERE userName=?', [data.user]);
 	} catch (err) {
 		return { err: err };
 	}
@@ -34,7 +34,7 @@ User.Authenticate = async (data) => {
 
 User.UnEncrypt = async () => {
 	try {
-		const password = await sql.query('SELECT * FROM bgoescmoyuocwga4lecd.users WHERE encryption=false');
+		const password = await sql.query('SELECT * FROM users WHERE encryption=false');
 		return password[0];
 	} catch (err) {
 		return { err: err };
@@ -43,7 +43,7 @@ User.UnEncrypt = async () => {
 
 User.Encrypt = async (data) => {
 	try {
-		const password = await sql.query('UPDATE bgoescmoyuocwga4lecd.users SET `password`=? , `encryption`=1 WHERE (`idUser` = ?);', [data.password, data.idUser]);
+		const password = await sql.query('UPDATE users SET `password`=? , `encryption`=1 WHERE (`idUser` = ?);', [data.password, data.idUser]);
 	} catch (err) {
 		console.log(err);
 	}

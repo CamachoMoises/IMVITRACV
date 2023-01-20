@@ -78,11 +78,12 @@ exports.Add = async (req, res) => {
 	// const lastOrder = last.toLocaleString('en', { minimumIntegerDigits: 4, useGrouping: false });
 	// data.code = `${workerType}-${lastOrder}`;
 	const add = await Worker.Add(data);
+	console.log('new',add[0].insertId);
 	if (add.err) {
 		console.log('Error in the database', add.err);
 		return res.status(400).json({ statusCode: 400, message: 'Error in the database', error: add.err });
 	}
-	return res.status(200).json({ statusCode: 200, message: `data saved`, id: null });
+	return res.status(200).json({ statusCode: 200, message: `data saved`, id: add[0].insertId });
 };
 exports.Update = async (req, res) => {
 	const data = {

@@ -1,4 +1,4 @@
-const mysql         = require('mysql2');
+const mysql = require('mysql2');
 
 var connection = mysql.createPool({
     host: 'bgoescmoyuocwga4lecd-mysql.services.clever-cloud.com',
